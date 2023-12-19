@@ -1,0 +1,2 @@
+#!/bin/sh
+exiv2 "$@" 2>&1 | perl -CDAS -lne 'if (/Image size/) { $x = $_; print for $x =~ /\d+/g }'

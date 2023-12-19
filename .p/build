@@ -1,0 +1,202 @@
+#!/usr/bin/env perl
+# vim: set fdm=marker:
+use v5.14; use warnings; use autodie; use utf8;
+use open qw[ :encoding(UTF-8) :std ];
+
+# definitions {{{
+
+# GENERAL
+
+use File::stat;
+
+# install markdown-it-py: https://github.com/executablebooks/markdown-it-py
+# install exiv2
+
+# for hashing static files to cache-bust them on change
+use Digest::file qw[ digest_file_base64 ];
+sub hash(_) { digest_file_base64(shift, 'SHA-1') =~ tr[+/][-_]r }
+
+sub err { warn "\e[1m\e[91m" . (join '', @_) . "\e[m\n" }
+
+sub ichomp(_) { my $x = $_[0]; chomp $x; return $x }  # in-place chomp
+sub slurp(_) { local $/; open my $f, '<', $_[0]; return scalar <$f> }
+sub slurp_lines(_)     { open my $f, '<', $_[0]; map { ichomp } <$f> }
+sub slurp_firstline(_) { open my $f, '<', $_[0]; ichomp scalar <$f> }
+
+# TAGS
+
+sub get_tags_for { my ($slug) = @_;
+  return '' unless -f "$slug/.tags";
+  my @tags_en = 
+  return join "&emsp;", map {
+    sprintf '<a href="{{root}}#tag=%s">#%s</a>',
+      (s/ /_/gr) x 2
+  } slurp_lines "$slug/.tags";
+}
+
+# TIME
+
+my @_days = qw[ الثاني الثالث الرابع الخامس السادس السابع الثامن التاسع ];
+my @ar_days = (0,
+  'الأول', @_days, 'العاشر',
+  (map { "$_ عشر" } 'الحادي', @_days), 'العشرين',
+  (map { "$_ والعشرين" } 'الحادي', @_days), 'الثلاثين',
+  'الحادي والثلاثين',
+);
+my @ar_months = (0,
+  'يناير / كانون الثاني',
+  'فبراير / شباط',
+  'مارس / أذار',
+  'ابريل / نيسان',
+  'مايو / أيار',
+  'يونيو / حزيران',
+  'يوليو / تموز',
+  'أغسطس / آب',
+  'سبتمبر / أيلول',
+  'أكتوبر / تشرين الأول',
+  'نوفمبر / تشرين الثاني',
+  'ديسمبر / كانون الأول',
+);
+
+sub arabize_numbers { ($_[0] // $_) =~ tr[0123456789][٠١٢٣٤٥٦٧٨٩]r }
+sub arabize_date_short { arabize_numbers($_[0] // $_) =~ s,-,/,gr }
+sub arabize_date_long {
+  my ($y, $m, $d) = split '-', ($_[0] // $_);
+  return join ' ',
+    'اليوم',
+    $ar_days[$d],
+    'من',
+    $ar_months[$m],
+    arabize_numbers($y),
+}
+
+sub make_time { my ($yyyy_mm_dd) = @_;
+  return sprintf '<time datetime="%s" title="%s">%s</time>',
+    $yyyy_mm_dd,
+    arabize_date_long($yyyy_mm_dd),
+    arabize_date_short($yyyy_mm_dd),
+}
+
+sub __parse_time_in { my ($slug, $upd_not_pub) = @_;
+  my $path = $slug . '/' . ($upd_not_pub ? '.upd' : '.pub');
+  my $name = $upd_not_pub ? 'updating' : 'publishing';
+  my $verb = $upd_not_pub ? 'عُدِّل' : 'نُشر';
+  my $date = ichomp slurp $path;
+  if ($date =~ m|^([0-9]{4}-[0-9]{2}-[0-9]{2})([.][0-9]+)?$|) {
+    return sprintf '<span>%s&nbsp;%s</span>%s', $verb, make_time($1), $2 // '';
+  }
+  else {
+    err "article '$slug' has invalid $name time: «$date»";
+    return;
+  }
+}
+
+sub get_time_for { my ($slug) = @_;
+  # for now, time is defined in $slug/.pub (publishing) and $slug/.upd (last update, if any),
+  # in YYYY-mm-dd formate (UTC day), optionally ending with '.1' (and so on)
+  # for subsequent posts in the same day.
+  if (!-f "$slug/.pub") {
+    err "article '$slug' has no publishing time";
+    return;
+  }
+  my $pub = __parse_time_in $slug;
+  return unless $pub;
+  return $pub unless -f "$slug/.upd";
+  my $upd = __parse_time_in $slug, 1;
+  return $pub . ' ' . $upd;
+}
+
+# }}}
+
+my $stylehash = hash 'etc/style.min.css';
+my $logo = slurp 'etc/logo.svg';
+
+my @posts;
+
+while (glob '*/') {
+  my $slug = $_ =~ s,/$,,r;
+  next if $slug eq 'etc';
+  if ($slug =~ /'/) { err "slug «$slug» has an apostrophe"; next }  # for parse
+  if (!-e "$slug/.src") { err "article '$slug' has no src"; next }
+  if (!-e "$slug/.head") { err "article '$slug' has no title"; next }
+  my $title = (ichomp slurp "$slug/.head")
+    =~ s|\[\[ (.*?) \]\]|<span dir="ltr" class="en">$1</span>|grx
+    ;
+  my $page_title = ($title =~ s,<[^<>]*>,,gr) . " — كتابات وترجمات نور الدين";
+  my $desc = ichomp slurp "$slug/.desc";
+  my $tags = get_tags_for $slug;
+  my $time = get_time_for $slug;
+  next unless $time;
+  my $img = -f "$slug/.img" ? (ichomp slurp "$slug/.img") : undef;
+  if ($img =~ /'/) { err "img «$img» in slug '$slug' has an apostrope"; next }  # for imgsize
+  my ($imgw, $imgh);
+  if ($img && -f "$slug/$img") {
+    ($imgw, $imgh) = map { ichomp } `.p/imgsize '$slug/$img'`;
+  }
+  else {
+    $img = '';
+  }
+  open my $f, '>', "$slug/index.html";
+  print { $f } slurp('.t/header.html')
+    =~ s|\Q{{pagetitle}}\E|$page_title|gr
+    =~ s|\Q{{title}}\E|$title|gr
+    =~ s|\Q{{description}}\E|$desc|gr
+    =~ s|\Q{{type}}\E|article|gr
+    =~ s|\Q{{pubtime}}\E|(ichomp slurp "$slug/.pub") =~ s,\.[0-9]+,,r|gre
+    =~ s|\Q{{tags}}\E|$tags =~ s,\Q{{root}}\E,../,gr|gre
+    =~ s|\Q{{time}}\E|$time =~ s,[.][0-9]+,,r|gre
+    =~ s|(.*)\Q{{imgurl}}\E(.*\n)|   $img ? "$1$img$2" : ''|gre
+    =~ s|(.*)\Q{{imgwidth}}\E(.*\n)| $img ? "$1$imgw$2" : ''|gre
+    =~ s|(.*)\Q{{imgheight}}\E(.*\n)|$img ? "$1$imgh$2" : ''|gre
+    =~ s|\Q{{logo}}\E|$logo|gr
+    =~ s|\Q{{root}}\E|../|gr
+    =~ s|\Q{{stylehash}}\E|$stylehash|gr
+    =~ s|\Q{{homelinkattrs}}\E|href="../"|gr
+    ;
+  my $h = 0;
+  print { $f } (scalar `.p/parse '$slug/.src'`)
+    =~ s|\{\{ ([0-9]{4}-[0-9]{2}-[0-9]{2}) \}\}|make_time($1)|grxe
+    =~ s|\+\+|&nbsp;|gr
+    =~ s|<h([23]) id="([^"]+)">(.*?)</h\1>|<h$1 id="$2"><a class="hh" href="#$2">#</a>$3</h$1>|gr
+    =~ s|<h([23])>(.*?)</h\1>|<h$1><a class="hh" id="h$h" href="#h@{[ ++$h ]}">#</a>$2</h$1>|gr
+    =~ s|\[\[ (.*?) \]\]|<span dir="ltr" class="en">$1</span>|grx
+    =~ s|<p>(<img[^<>]*>)</p>|<center>$1</center>|gr
+    ;
+  print { $f } slurp('.t/footer.html');
+  close $f;
+  my @img = $img ? ( img => "$slug/$img", imgw => $imgw, imgh => $imgh ) : ();
+  push @posts, { slug => $slug, title => $title, time => $time, tags => $tags, description => $desc, @img };
+  say "wrote '$slug'";
+}
+
+# home page
+
+open my $f, '>', 'index.html';
+print { $f } slurp('.t/header.html')
+  =~ s|\Q{{pagetitle}}\E|كتابات وترجمات — نور الدين|gr
+  =~ s|\Q{{title}}\E|كتابات وترجمات — نور الدين|gr
+  =~ s|.*\Q{{description}}\E.*\n||gr  # TODO: add a description
+  =~ s|\Q{{type}}\E|website|gr
+  =~ s|.*\Q{{pubtime}}\E.*\n||gr
+  =~ s|\Q{{logo}}\E|$logo|gr
+  =~ s|\Q{{root}}\E||gr
+  =~ s|\Q{{stylehash}}\E|$stylehash|gr
+  =~ s|\Q{{homelinkattrs}}\E|aria-current="page" href=""|gr
+  =~ s|^<div class="meta".*\n||mgr
+  ;
+print { $f } join "\n", map {
+  my $tags = $_->{tags} =~ s,\Q{{root}}\E,,gr;
+  my $time = $_->{time} =~ s,[.][0-9]+,,r;
+  my $img = $_->{img} ? qq[<center><img alt="" src="$_->{img}" width="$_->{imgw}" height="$_->{imgh}"></center>] : '';
+  qq[<section class="card">
+     <a href="$_->{slug}">$img$_->{title}</a>
+     <p>$_->{description}</p>
+     <div class="meta">
+       <div class="tags">$tags</div>
+       <div class="time">$time</div>
+     </div>
+    </section>] =~ s/\s+/ /gr
+  } sort { $b->{time} cmp $a->{time} } @posts;
+print { $f } slurp('.t/footer.html');
+close $f;
+

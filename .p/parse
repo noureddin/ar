@@ -1,0 +1,18 @@
+#!/usr/bin/env python3
+
+import sys
+
+from markdown_it import MarkdownIt
+from mdit_py_plugins.container import container_plugin
+from mdit_py_plugins.attrs import attrs_block_plugin
+
+md = (
+  MarkdownIt('commonmark' ,{'html':True})
+  .use(container_plugin, name='note')
+  .use(attrs_block_plugin)
+  .enable('table')
+  .enable('strikethrough')
+)
+
+with open(sys.argv[1], 'r', encoding='utf-8') as f:
+  print(md.render(f.read()))
