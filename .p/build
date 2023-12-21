@@ -162,7 +162,9 @@ while (glob '*/') {
     =~ s|\[\[ (.*?) \]\]|<span dir="ltr" class="en">$1</span>|grx
     =~ s|<p>(<img[^<>]*>)</p>|<center>$1</center>|gr
     ;
-  print { $f } slurp('.t/footer.html');
+  print { $f } slurp('.t/footer.html')
+    =~ s|\Q{{homelinkattrs}}\E|href="../"|gr
+    ;
   close $f;
   my @img = $img ? ( img => "$slug/$img", imgw => $imgw, imgh => $imgh ) : ();
   push @posts, { slug => $slug, title => $title, time => $time, tags => $tags, description => $desc, @img };
@@ -197,6 +199,8 @@ print { $f } join "\n", map {
      </div>
     </section>] =~ s/\s+/ /gr
   } sort { $b->{time} cmp $a->{time} } @posts;
-print { $f } slurp('.t/footer.html');
+print { $f } slurp('.t/footer.html')
+  =~ s|\Q{{homelinkattrs}}\E|aria-current="page" href=""|gr
+  ;
 close $f;
 
