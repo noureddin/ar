@@ -17,6 +17,7 @@ footer { font-size: 0.80rem }
 .note  { font-size: 0.875rem }
 .en    { font-size: 0.875em }
 .card>p{ font-size: 0.80rem }  /* articles' summaries on the home page */
+.tnote { font-size: 0.75rem }  /* tag-filter note on the home page */
 
 /* colors */
 
@@ -206,3 +207,9 @@ h1:last-child {
   width: auto;
 }
 
+.tnote {
+  width: var(--width);
+  margin: 1em auto;
+  text-align: center;
+  background: var(--note-bg);
+}

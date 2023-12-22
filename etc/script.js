@@ -33,6 +33,20 @@ function article_match_tag (article_tags, tag_param) {
   return true
 }
 
+function tags_human (tag_param) {
+  const start = 'لا تظهر إلا التدوينات التي '
+  const end = '.&emsp;<a href="">ألغِ التصفية؟</a>'
+  if (tag_param.match(/^[^^+,;]+$/)) {
+    if (tag_param.charAt(0) === '!') {
+      return start + '<b>لا</b> توافق الوسم #' + tag_param.slice(1) + end
+    }
+    else {
+      return start + 'توافق الوسم #' + tag_param + end
+    }
+  }
+  return true
+}
+
 onhashchange = onload = () => {
   // for now, the only valid hash parameter is '#tag=TAG'; with support for operations.
   const m = location.hash.match(/[#&]tag=([^&]+)/)
@@ -40,6 +54,7 @@ onhashchange = onload = () => {
     document.querySelectorAll('section.card').forEach(el => {
       el.style.display = 'block'
     })
+    document.querySelector('.tnote').hidden = true
     return
   }
   const tag = decodeURIComponent(m[1])
@@ -48,5 +63,7 @@ onhashchange = onload = () => {
     const matches = article_match_tag(tags, tag)
     el.style.display = matches ? 'block' : 'none'
   })
+  document.querySelector('.tnote').innerHTML = tags_human(tag)
+  document.querySelector('.tnote').hidden = false
 }
 
