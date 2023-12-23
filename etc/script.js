@@ -1,4 +1,4 @@
-'use strict'
+// 'use strict'
 
 function article_match_tag (article_tags, tag_param) {
   // operations supported:

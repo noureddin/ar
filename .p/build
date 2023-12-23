@@ -164,6 +164,7 @@ while (glob '*/') {
     ;
   print { $f } slurp('.t/footer.html')
     =~ s|\Q{{homelinkattrs}}\E|href="../"|gr
+    =~ s|^<script.*\n||mgr  # script is used only on the home page for filtering by tags
     ;
   close $f;
   my @img = $img ? ( img => "$slug/$img", imgw => $imgw, imgh => $imgh ) : ();
@@ -201,6 +202,7 @@ print { $f } join "\n", map {
   } sort { $b->{time} cmp $a->{time} } @posts;
 print { $f } slurp('.t/footer.html')
   =~ s|\Q{{homelinkattrs}}\E|aria-current="page" href=""|gr
+  =~ s|\Q{{scripthash}}\E|hash 'etc/script.min.js'|gre
   ;
 close $f;
 
