@@ -1,5 +1,6 @@
 ::: note
 هذا المقال مترجم عن [[[How to Kill a Decentralised Network (such as the Fediverse)]]](https://ploum.net/2023-06-23-how-to-kill-decentralised-networks.html)، المنشور++{{2023-06-23}}.
+وقد نشرت هذه الترجمة أيضا [في مجتمع أسس](https://discourse.aosus.org/t/topic/3012).
 :::
 
 ![](metadeath.webp)
@@ -60,7 +61,7 @@
 
 وكانت تلك العلل، مع ضغوط سياسية، سببًا في تقهقر مدينة ميونخ عن هجرتها إلى لينكس. إذًا فنعم، مكيدة الحرب تلك تنجح فعلا. واليوم ما زالت صيغ [[docx/xlsx/pptx]] هي العرف السائد لهذا السبب. المصدر: لقد كنت هناك، وقد كلفت مدينة ميونخ مَن كلفني بجعل عرض تلك الصيغ في [[LibreOffice]] أقرب من ميكروسوفت أوفيس وليس من التوصيف.
 
-حتى إن هذه الحيلة لها [مقالة على ويكيبديا الإنجليزية](https://en.wikipedia.org/wiki/Embrace,_extend,_and_extinguish).
+حتى إن لهذه الحيلة [مقالة على ويكيبديا الإنجليزية](https://en.wikipedia.org/wiki/Embrace,_extend,_and_extinguish).
 
 ::: note
 من المترجم: وانظر أيضا الفقرة قبل الأخيرة من مقالة [[[Fire And Motion]]](https://www.joelonsoftware.com/2002/01/06/fire-and-motion/) لأحد كبار المبرمجين الذي عمل في ميكروسوفت ومن مؤسسي [[StackOverflow]].

@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+use v5.14; use warnings; use autodie; use utf8;
+use open qw[ :encoding(UTF-8) :std ];
+sub slurp_stdin() { local $/; return scalar <> }
+
+$_ = slurp_stdin();
+
+# remove [[latin]] and {{time}} marks
+s,([][}{])\1,,g;
+
+# remove headings' attributes
+s,^\{[^{}]+\}\n,,mg;
+
+# convert NBSP
+s,\+\+,&nbsp;,g;
+
+# convert note admonitions to ordinary blockquotes.
+s{^::: note\n(.*?)^:::$}{
+  $1 =~ s/^/> /mgr
+}msge;
+
+print;
