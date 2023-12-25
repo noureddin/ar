@@ -81,7 +81,7 @@ sub __parse_time_in { my ($slug, $upd_not_pub) = @_;
   my $path = $slug . '/' . ($upd_not_pub ? '.upd' : '.pub');
   my $name = $upd_not_pub ? 'updating' : 'publishing';
   my $verb = $upd_not_pub ? 'عُدِّل' : 'نُشر';
-  my $date = ichomp slurp $path;
+  my $date = slurp_firstline $path;
   if ($date =~ m|^([0-9]{4}-[0-9]{2}-[0-9]{2})([.][0-9]+)?$|) {
     return sprintf '<span>%s&nbsp;%s</span>%s', $verb, make_time($1), $2 // '';
   }
@@ -119,11 +119,11 @@ while (glob '*/') {
   if ($slug =~ /'/) { err "slug «$slug» has an apostrophe"; next }  # for parse
   if (!-e "$slug/.src") { err "article '$slug' has no src"; next }
   if (!-e "$slug/.head") { err "article '$slug' has no title"; next }
-  my $title = (ichomp slurp "$slug/.head")
+  my $title = (slurp_firstline "$slug/.head")
     =~ s|\[\[ (.*?) \]\]|<span dir="ltr" class="en">$1</span>|grx
     ;
   my $page_title = ($title =~ s,<[^<>]*>,,gr) . " — كتابات وترجمات نور الدين";
-  my $desc = ichomp slurp "$slug/.desc";
+  my $desc = slurp_firstline "$slug/.desc";
   my $tags = get_tags_for $slug;
   my $time = get_time_for $slug;
   next unless $time;
@@ -152,6 +152,7 @@ while (glob '*/') {
     =~ s|\Q{{root}}\E|../|gr
     =~ s|\Q{{stylehash}}\E|$stylehash|gr
     =~ s|\Q{{homelinkattrs}}\E|href="../"|gr
+    =~ s|\Z|\n<article>|r
     ;
   my $h = 0;
   print { $f } (scalar `.p/parse '$slug/.src'`)
@@ -166,10 +167,12 @@ while (glob '*/') {
       my ($w, $h) = map { ichomp } `.p/imgsize '$slug/$imgurl'`;
       qq[<img width="$w" height="$h"$prefix="$imgurl"]
     }gre
+    =~ s/\s+\Z//gr
     ;
   print { $f } slurp('.t/footer.html')
     =~ s|\Q{{homelinkattrs}}\E|href="../"|gr
     =~ s|\Q{{homescripttag}}\E\n||gr  # script is used only on the home page for filtering by tags
+    =~ s|\A|\n</article>\n|r
     ;
   close $f;
   my @img = $img ? ( img => "$slug/$img", imgw => $imgw, imgh => $imgh ) : ();
@@ -191,23 +194,25 @@ print { $f } slurp('.t/header.html')
   =~ s|\Q{{stylehash}}\E|$stylehash|gr
   =~ s|\Q{{homelinkattrs}}\E|aria-current="page" href=""|gr
   =~ s|^<div class="meta".*\n||mgr
+  =~ s|\Z|\n<main>|r
   ;
 print { $f } join "\n", map {
   my $tags = $_->{tags} =~ s,\Q{{root}}\E,,gr;
   my $time = $_->{time} =~ s,[.][0-9]+,,r;
   my $img = $_->{img} ? qq[<center><img alt="" src="$_->{img}" width="$_->{imgw}" height="$_->{imgh}"></center>] : '';
-  qq[<section class="card">
-     <a href="$_->{slug}">$img$_->{title}</a>
-     <p>$_->{description}</p>
-     <div class="meta">
-       <div class="tags">$tags</div>
-       <div class="time">$time</div>
-     </div>
-    </section>] =~ s/\s+/ /gr
+  qq[<section class="card"><!--
+   --><a href="$_->{slug}">$img$_->{title}</a><!--
+   --><p>$_->{description}</p><!--
+   --><div class="meta"><!--
+     --><div class="tags">$tags</div><!--
+     --><div class="time">$time</div><!--
+   --></div><!--
+  --></section>] =~ s/\s+/ /gr =~ s/<!--.*?-->//gr =~ s/\s*\Z//gr
   } sort { $b->{time} cmp $a->{time} } @posts;
 print { $f } slurp('.t/footer.html')
   =~ s|\Q{{homelinkattrs}}\E|aria-current="page" href=""|gr
   =~ s|\Q{{homescripttag}}\E|<script>@{[slurp 'etc/homescript.min.js']}</script>|gr
+  =~ s|\A|\n</main>\n|r
   ;
 close $f;
 
