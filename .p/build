@@ -161,6 +161,11 @@ while (glob '*/') {
     =~ s|<h([23])>(.*?)</h\1>|<h$1><a class="hh" id="h$h" href="#h@{[ ++$h ]}">#</a>$2</h$1>|gr
     =~ s|\[\[ (.*?) \]\]|<span dir="ltr" class="en">$1</span>|grx
     =~ s|<p>(<img[^<>]*>)</p>|<center>$1</center>|gr
+    =~ s{<img(\b[^<>]+\bsrc)="([^<>"]+)"}{
+      my ($prefix, $imgurl) = ($1, $2);
+      my ($w, $h) = map { ichomp } `.p/imgsize '$slug/$imgurl'`;
+      qq[<img width="$w" height="$h"$prefix="$imgurl"]
+    }gre
     ;
   print { $f } slurp('.t/footer.html')
     =~ s|\Q{{homelinkattrs}}\E|href="../"|gr
