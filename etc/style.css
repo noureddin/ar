@@ -146,16 +146,29 @@ img {
 
 /* header anchors */
 
-.hh { display: none }
-
 h2, h3 { position: relative }
+.hh { position: absolute }
 
-*:hover > .hh {
-  display: inline;
-  position: absolute;
-  top: 0;
-  right: -2.5em;
-  padding: 0 1em;
+/* .hs is a span of just &nbsp; that is added to the end of h[23] */
+/* it is to make enough room for the anchor link. */
+
+@media (min-width: 800px) {
+  .hs { display: none }
+  .hh {
+    display: inline;
+    top: 0;
+    right: -1.5em;
+  }
+}
+@media (max-width: 800px) {
+  .hh {
+    bottom: 0;
+    left: 0;
+  }
+}
+
+@media print {
+.hh { display: none }
 }
 
 /* misc */
