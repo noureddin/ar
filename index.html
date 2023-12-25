@@ -47,7 +47,8 @@
 </small>
 </div>
 </footer>
-<script src="etc/script.min.js?h=Qb9nG3Pjr11r7aNHNAwbQzg9TQ8"></script>
+<script>function c(e,n){return!n.match(/^[^^+,;]+$/)||("!"===n.charAt(0)?!e.includes(n.slice(1)):e.includes(n))}function n(e){var n="لا تظهر إلا التدوينات التي ",t='.&emsp;<a href="">ألغِ التصفية؟</a>';return!e.match(/^[^^+,;]+$/)||("!"===e.charAt(0)?n+"<b>لا</b> توافق الوسم #"+e.slice(1)+t:n+"توافق الوسم #"+e+t)}const o=(e,n)=>document.querySelectorAll(e).forEach(n),a=e=>document.querySelector(e);onhashchange=onload=()=>{var e=location.hash.match(/[#&]tag=([^&]+)/);if(null==e||0===e[1].length)o("section.card",e=>{e.style.display="block"}),a(".tnote").hidden=!0;else{const t=decodeURIComponent(e[1]);o("section.card",e=>{var n=c(e.querySelector(".tags").innerText.split(/\s+/).map(e=>e.slice(1)),t);e.style.display=n?"block":"none"}),a(".tnote").innerHTML=n(t),a(".tnote").hidden=!1}};
+</script>
 </body>
 </html>
 

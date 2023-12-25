@@ -1,6 +1,6 @@
 all: build
 
-build: etc/style.min.css etc/script.min.js
+build: etc/style.min.css etc/homescript.min.js
 	@.p/build
 
 %.min.css: %.css

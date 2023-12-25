@@ -47,23 +47,26 @@ function tags_human (tag_param) {
   return true
 }
 
+const qeach = (q,fn) => document.querySelectorAll(q).forEach(fn)
+const sel = (q) => document.querySelector(q)
+
 onhashchange = onload = () => {
   // for now, the only valid hash parameter is '#tag=TAG'; with support for operations.
   const m = location.hash.match(/[#&]tag=([^&]+)/)
   if (m == null || m[1].length === 0) {
-    document.querySelectorAll('section.card').forEach(el => {
+    qeach('section.card', (el) => {
       el.style.display = 'block'
     })
-    document.querySelector('.tnote').hidden = true
+    sel('.tnote').hidden = true
     return
   }
   const tag = decodeURIComponent(m[1])
-  document.querySelectorAll('section.card').forEach(el => {
+  qeach('section.card', (el) => {
     const tags = el.querySelector('.tags').innerText.split(/\s+/).map(t => t.slice(1))  // slice to remove the hash
     const matches = article_match_tag(tags, tag)
     el.style.display = matches ? 'block' : 'none'
   })
-  document.querySelector('.tnote').innerHTML = tags_human(tag)
-  document.querySelector('.tnote').hidden = false
+  sel('.tnote').innerHTML = tags_human(tag)
+  sel('.tnote').hidden = false
 }
 
