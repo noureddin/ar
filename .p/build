@@ -231,7 +231,7 @@ print { $f } join "\n", map {
   my $time = $_->{time} =~ s,[.][0-9]+,,r;
   my $img = $_->{picture} // '';
   qq[<section class="card"><!--
-   --><a href="$_->{slug}">$img$_->{title}</a><!--
+   --><h2><a href="$_->{slug}">$img$_->{title}</a></h2><!--
    --><p>$_->{description}</p><!--
    --><div class="meta"><!--
      --><div class="tags">$tags</div><!--
