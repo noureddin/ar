@@ -160,7 +160,7 @@ while (glob '*/') {
     =~ s|\+\+|&nbsp;|gr
     =~ s|<h([23]) id="([^"]+)">(.*?)</h\1>|<h$1 id="$2"><a class="hh" href="#$2">#</a>$3<span class="hs">&nbsp;</span></h$1>|gr
     =~ s|<h([23])>(.*?)</h\1>|<h$1 id="h$h"><a class="hh" href="#h@{[ ++$h ]}">#</a>$2<span class="hs">&nbsp;</span></h$1>|gr
-    =~ s|\[\[ (.*?) \]\]|<span dir="ltr" class="en">$1</span>|grx
+    =~ s|\[\[ (.*?) \]\]|<span class="en">$1</span>|grx
     =~ s|<p>(<img[^<>]*>)</p>|<center>$1</center>|gr
     =~ s{<img(\b[^<>]+\bsrc)="([^<>"]+)"}{
       my ($prefix, $imgurl) = ($1, $2);
