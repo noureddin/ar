@@ -1,0 +1,71 @@
+<!doctype html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="utf-8">
+<title>‫Syncthing: الأستاذ في إزالة تكرار البيانات — كتابات وترجمات نور الدين</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" type="text/css" href="../etc/style.min.css?h=vi68Eipqf-a44ZrVr8McQMRY-Cs">
+<meta property="og:locale" content="ar_AR">
+<meta property="og:type" content="article">
+<meta property="og:article:published_time" content="2023-12-26">
+<meta property="og:title" content="‫Syncthing: الأستاذ في إزالة تكرار البيانات — كتابات وترجمات نور الدين">
+<meta property="og:description" content="‫Syncthing هو برنامج حر ومفتوح المصدر للمزامنة المعمّاة للمجلدات بين نظيرين (peer-to-peer). ويستعمل أساليب إزالة التكرار لتقليل مقدار البيانات التي يحتاج نقلها عبر الشبكة، مما يوفر لك تكاليف الاتصال، والطاقة، والوقت. ويمكنك الآن (اختياريا) أن تسمح له بإزالة التكرار في البيانات المخزنة على الحاسوب، لتقليل تكاليف التخزين.">
+<meta property="og:image" content="syncthing-storage-nvme-hdd-small.png"/>
+<meta property="og:image:width" content="1000"/>
+<meta property="og:image:height" content="563"/>
+<link rel="icon" type="image/png" sizes="72x72" href="../etc/favicon-72x72.png">
+<link rel="icon" type="image/png" sizes="16x16" href="../etc/favicon-16x16.png">
+<link rel="icon" type="image/svg+xml" sizes="any" href="../etc/favicon.svg">
+</head>
+<body>
+<header id="navbar">
+<div class="header-content">
+<a id="logo" href="/"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 440"><title>نور الدين</title><defs><filter id="A" x="-.964" width="2.927" y="-1.037" height="3.073" color-interpolation-filters="sRGB"><feGaussianBlur stdDeviation="191.747"/></filter></defs><g transform="translate(809.761 -146.954)"><rect width="439.972" height="440" x="-809.733" y="146.954" ry=".031"/><rect width="477.55" height="443.891" x="-699.972" y="116.772" ry=".031" transform="matrix(.921369 0 0 .991235 -164.82903 31.206237)" fill="#039" paint-order="markers stroke fill" filter="url(#A)"/><g stroke="#fff" fill="none" stroke-linecap="round" stroke-width="18.283"><path d="M-495.984 295.31v181.858l-169.272-200.427v-20h38.553v220.427" stroke-linejoin="round"/><path d="M-683.539 256.741v220.427m187.555-220.427h0"/></g></g></svg>
+ نور الدين</a>&emsp;
+<nav>
+<a href="../">كتابات وترجمات</a> │
+<a rel="noreferrer noopener" href="https://github.com/noureddin">جت‌هب</a>
+</nav>
+</div>
+</header>
+<header class="title">
+<h1>‫Syncthing: الأستاذ في إزالة تكرار البيانات</h1>
+<div class="meta"><div class="tags"><a href="../#tag=مزامنة">#مزامنة</a>&emsp;<a href="../#tag=أنظمة_ملفات">#أنظمة_ملفات</a></div><div class="time"><span>نُشر&nbsp;<time datetime="2023-12-26" title="اليوم السادس والعشرين من ديسمبر / كانون الأول ٢٠٢٣">٢٠٢٣/١٢/٢٦</time></span></div></div>
+</header>
+<div class="hsep">&nbsp;</div>
+<p class="tnote" hidden></p>
+<article>
+<div class="note">
+<p>هذا المقال مترجم عن <a href="https://www.ctrl.blog/entry/syncthing-deduplication-master.html">Syncthing: The data dedup­lica­tion master</a>، المنشور&nbsp;<time datetime="2022-05-05" title="اليوم الخامس من مايو / أيار ٢٠٢٢">٢٠٢٢/٠٥/٠٥</time>.</p>
+</div>
+<center><picture><source type="image/avif" srcset="syncthing-storage-nvme-hdd-small.avif" width="1000" height="563"><source type="image/webp" srcset="syncthing-storage-nvme-hdd-small.webp" width="1000" height="563"><img src="syncthing-storage-nvme-hdd-small.png" width="1000" height="563"></picture></center>
+<p><a href="https://syncthing.net/">‫Syncthing</a> هو برنامج حر ومفتوح المصدر للمزامنة المعمّاة للمجلدات بين نظيرين (peer-to-peer). ويستعمل أساليب إزالة التكرار لتقليل مقدار البيانات التي يحتاج نقلها عبر الشبكة، مما يوفّر لك تكاليف الاتصال، والطاقة، والوقت. ويمكنك الآن (اختياريًّا) أن تسمح له بإزالة التكرار في البيانات المخزنة على الحاسوب، لتقليل تكاليف التخزين.</p>
+<p>يمكنك اعتبار Syncthing خدمة تخزين سحابي مثل Dropbox أو OneDrive، لكن بغير خادوم وسيط أو تكاليف. فهو ينقل ملفاتك بين أجهزتك مباشرةً. ويتيح لك مزامنة المجلدات بأمان بغير أن تضطر إلى ائتمان مزود خدمة تخزين سحابي على بياناتك.</p>
+<p>يقسّم Syncthing الملفات الكبيرة إلى «كتل»، مثلما تفعل أنظمة الملفات. ثم ينظر أيّها تغيرت، فلا يرسل غيرها عبر الشبكة. ويستطيع مشاركة الكتل بين الملفات وحتى بين المجلدات المزامنة المختلفة. فهذا يوفر زمن النقل، واستعمال الشبكة، والطاقة.</p>
+<p>ويجمع Syncthing بيانات الاستخدام من مستخدميه. فيسجّل مقدار التقليل في نقل البيانات الناتج عن هذه الخاصية. وحتى وقت النشر، ٥٦٫٤٨٪ من البيانات المزامنة أُعيد استعمالها من الملفات المحلية. (ويمكن افتراض أن التوفير المتوقع من خاصية إزالة التكرار في التخزين قريب من هذه النسبة.)</p>
+<p>فخاصية إزالة التكرار في التخزين تعتمد على هذه الخاصية المستعملة لتقليل استعمال الشبكة وتطوّعها من أجل توفير مساحة القرص المحلي. فالآلية نفسها تُستعمل لمشاركة كتل الملفات المتطابقة على القرص بين الملفات المختلفة.</p>
+<p>ويمكن لهذه الخاصية أن تقلل تقليلًا كبيرًا من المساحة التي يستهلكها نظام Syncthing لنُسخ الملفات. (أنظمة نُسخ الملفات (file versioning) تحفظ نسخ الملفات عند تعديلها. ربما هذا سبب ارتفاع نسبة إزالة التكرار في نقل Syncthing الشبكي.) فبحسب ملفاتك وطبيعة استخدامك، قد تجري تغييرات طفيفة على الملفات، فلا يحتاج Syncthing إلا أن يخزّن كتلتين مختلفتين من البيانات المعدّلة، وليس أن يخزّن الملف كله مرتين. (وهذه الطريقة موفرة جدا في حال ملفات أقراص الأجهزة الوهمية، وملفات السجلات، وملفات الأرشفة التي تضيف إليها في نهايتها، وهياكل بيانات «الإلحاق فقط» (append-only) الأخرى.)</p>
+<p>وهذه الخاصية مدعومة في <a href="https://www.ctrl.blog/entry/file-cloning.html">أغلب أنظمة الملفات التي تدعم الاستنساخ</a> (cloning)، مثل <span class="en">Btrfs</span> و<span class="en">XFS</span> و<span class="en">EXT4</span> على لينكس وسولارس، و<span class="en">ReFS</span> على وندوز. (<span class="en">NTFS</span> هو نظام الملفات المبدئي على وندوز. وليس <span class="en">ReFS</span> متاحًا إلا على إصدارات Workstation وServer.)</p>
+<p>نظام الملفات <span class="en">OpenZFS</span> غير مدعوم، ولا نظام <span class="en">ZFS</span>، لأنهما لا يتيحان نداءات النظام (syscall) المطلوبة. ونظام <span class="en">APFS</span> المستعمل في macOS ليس مدعومًا أيضًا، مع أنه يتيح نداء <nobr><code>clonefile</code></nobr>؛ فهذا النداء يستنسخ الملفات بكاملها، وليس مثل لينكس وسولارس يستطيع استنساخ الكتل المفردة.</p>
+<p>وهذه الخاصية مقيدة بنفس التقييد المفروض على استنساخ الملفات المعتاد: يجب عمل الاستنساخات على نفس تقسيم القرص، ولا يمكن لها عبور حدود أنظمة الملفات أو اجتياز تقسيمات الأقراص. قد يسبب هذا التقييد بعض الأخطاء في المزامنة لأن Syncthing قد يشارك بعض الكتل بين المجلدات المزامنة لأنه لا يدرك حدود أنظمة الملفات.</p>
+<p>إزالة التكرار في التخزين ليست خاصية مفعلة مبدئيّا، على الأقل حتى نسخة 1.19.1 من Syncthing. لكن يمكنك تفعيلها لكل مجلد أو جعلها السلوك المبدئي من نافذة الخيارات المتقدمة (Advanced settings): ابحث عن خيار ”Copy Range Method“ وأعطه <a href="https://docs.syncthing.net/advanced/folder-copyrangemethod.html">قيمة مقبولة</a>.</p>
+<p>على لينكس أقترح اختيار <nobr><code>ioctl</code></nobr> (والذي يستعمل نداء النظام <nobr><code>FICLONERANGE</code></nobr>)، إذ إن الخيار <nobr><code>copy_file_range</code></nobr> قد أضر باستقرار نظامي. والخيار المخصوص <nobr><code>all</code></nobr> يجرب الطرق المختلفة بادئًا بـ<nobr><code>ioctl</code></nobr>، ثم ينتهي إلى نسخ عادي إن فشلت جميع الطرق، مما يقلل من أخطاء المزامنة (انظر الفقرة السابقة) لكنه قد يضر باستقرار نظام التشغيل إن استعمل <nobr><code>copy_file_range</code></nobr>.</p>
+<p>أُضيفت خاصية إزالة التكرار في Syncthing النسخة 1.8.0 (المُصدرة في يوليو / تموز عام ٢٠٢٠م)، وما زالت تعتبر تجريبية. وغالبا ستبقى هكذا وقتًا، بسبب احتمال أن هذه الخاصية قد تسبب علة تتسبب في فقد بيانات.</p>
+<p>(<a href="https://www.ctrl.blog/media/hero/syncthing-storage-nvme-hdd.avif">الصورة</a> من <a href="https://www.ctrl.blog/entry/syncthing-deduplication-master.html">المنشور الأصلي</a> من <a href="https://www.daniel.priv.no/">Daniel Aleksandersen</a> بترخيص <a href="https://creativecommons.org/licenses/by/4.0/deed.ar">CC BY 4.0 License</a>.)</p>
+</article>
+<footer>
+<div class="footer-content">
+<nav>
+<a rel="author" href="/">نور الدين</a> │
+<a href="../">كتابات وترجمات</a> │
+<a rel="noreferrer noopener" href="https://github.com/noureddin">جت‌هب</a>
+</nav>
+<small class="blurred">
+ما لم يذكر غير ذلك، المحتوى متاح بترخيص
+<a rel="noreferrer noopener license" href="https://creativecommons.org/licenses/by-sa/4.0/deed.ar">CC BY-SA 4.0</a>
+</small>
+</div>
+</footer>
+</body>
+</html>
+
