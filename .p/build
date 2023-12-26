@@ -197,6 +197,7 @@ while (glob '*/') {
     }gre
     =~ s|<p>(<img[^<>]*>)</p>|<center>$1</center>|gr
     =~ s|<p>(!!)(\S+)</p>|picture_of("$slug/$2") =~ s,"$slug/,",gr|gre
+    =~ s|(<code>.*?</code>)|<nobr>$1</nobr>|gr  # or "`code`;" could have a line break after `code`; see https://stackoverflow.com/a/40827310
     =~ s/\s+\Z//gr
     ;
   print { $f } slurp('.t/footer.html')
