@@ -156,7 +156,7 @@ while (glob '*/') {
   my $time = get_time_for $slug;
   next unless $time;
   my $img = -f "$slug/.img" ? (firstline "$slug/.img").'.png' : undef;
-  if ($img =~ /'/) { err "img «$img» in slug '$slug' has an apostrope"; next }  # for imgsize
+  if ($img && $img =~ /'/) { err "img «$img» in slug '$slug' has an apostrope"; next }  # for imgsize
   my ($imgw, $imgh);
   if ($img && -f "$slug/$img") {
     ($imgw, $imgh) = map { ichomp } `.p/imgsize '$slug/$img'`;
