@@ -50,7 +50,7 @@ code   { font-size: 0.875em }
   .note  { background: rgba(0, 0, 0, 0.05) }
   .tnote { background: rgba(0, 0, 0, 0.05) }
   code   { background: rgba(0, 0, 0, 0.05) ;
-         border-color: rgba(0, 0, 0, 0.15) }
+         border-color: rgba(0, 0, 0, 0.10) }
 
   :root {
     --shadow:   rgba(0, 0, 0, 0.3);
@@ -89,7 +89,7 @@ code   { font-size: 0.875em }
   .note  { background: rgba(255, 255, 255, 0.06) }
   .tnote { background: rgba(255, 255, 255, 0.06) }
   code   { background: rgba(255, 255, 255, 0.06) ;
-         border-color: rgba(255, 255, 255, 0.30) }
+         border-color: rgba(255, 255, 255, 0.12) }
 
   :root {
     --shadow:   rgba(255, 255, 255, 0.2);
@@ -214,6 +214,14 @@ code {
   display: inline-block;
   line-height: 1.4;
 }
+
+li {
+  margin-right: -0.5em;
+}
+ol {
+  list-style: arabic-indic;
+}
+/* <ol> shouldn't have 100 or more <li> */
 
 /* home page */
 
