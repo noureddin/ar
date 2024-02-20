@@ -2,13 +2,15 @@
 # vim: set fdm=marker:
 use v5.14; use warnings; use autodie; use utf8;
 use open qw[ :encoding(UTF-8) :std ];
-use List::Util qw[ max maxstr ];
 
 # definitions {{{
 
 # GENERAL
 
 use File::stat;
+
+# for generating the date for the Atom feed
+use List::Util qw[ max maxstr ];
 
 # install markdown-it-py: https://github.com/executablebooks/markdown-it-py
 # install exiv2
@@ -56,7 +58,6 @@ sub picture_of { my ($base) = @_;
 
 sub get_tags_for { my ($slug) = @_;
   return '' unless -f "$slug/.tags";
-  my @tags_en = 
   return join "&emsp;", map {
     sprintf '<a href="{{root}}#tag=%s">#%s</a>',
       (s/ /_/gr) x 2
@@ -108,11 +109,13 @@ sub make_time { my ($yyyy_mm_dd) = @_;
 
 sub __parse_time_in { my ($slug, $upd_not_pub) = @_;
   my $path = $slug . '/' . ($upd_not_pub ? '.upd' : '.pub');
+  if ($upd_not_pub && !-f $path) { return }
+  # file is checked for upd only b/c pub is already checked
   my $name = $upd_not_pub ? 'updating' : 'publishing';
   my $verb = $upd_not_pub ? 'عُدِّل' : 'نُشر';
   my $date = firstline $path;
   if ($date =~ m|^([0-9]{4}-[0-9]{2}-[0-9]{2})([.][0-9]+)?$|) {
-    return sprintf '<span>%s&nbsp;%s</span>%s', $verb, make_time($1), $2 // '';
+    return $&, sprintf '<span>%s&nbsp;%s</span>%s', $verb, make_time($1), $2 // '';
   }
   else {
     err "article '$slug' has invalid $name time: «$date»";
@@ -124,15 +127,21 @@ sub get_time_for { my ($slug) = @_;
   # time is defined in $slug/.pub (publishing) and $slug/.upd (last update, if any),
   # in YYYY-mm-dd formate (UTC day),
   # optionally ending with '.1' (and so on) for subsequent posts in the same day.
+  # this returns an object of three:
+  #   str => the human readable html localized time
+  #   pub => the exact content of slug/.pub if valid otherwise undef
+  #   upd => the exact content of slug/.upd if valid otherwise undef
+  #
   if (!-f "$slug/.pub") {
     err "article '$slug' has no publishing time";
     return;
   }
-  my $pub = __parse_time_in $slug;
-  return unless $pub;
-  return $pub unless -f "$slug/.upd";
-  my $upd = __parse_time_in $slug, 1;
-  return $pub . ' ' . $upd;
+  my ($pub, $pub_str) = __parse_time_in $slug;
+  my ($upd, $upd_str) = __parse_time_in $slug, 1;
+  return
+    str => (join ' ', grep { defined } $upd_str, $pub_str) =~ s|[.][0-9]+||gr,
+    pub => $pub,
+    upd => $upd,
 }
 
 # }}}
@@ -154,8 +163,8 @@ while (glob '*/') {
   my $page_title = ($title =~ s,<[^<>]*>,,gr) . " — كتابات وترجمات نور الدين";
   my $desc = firstline "$slug/.desc";
   my $tags = get_tags_for $slug;
-  my $time = get_time_for $slug;
-  next unless $time;
+  my %time = get_time_for $slug;
+  next unless $time{str};
   my $img = -f "$slug/.img" ? (firstline "$slug/.img").'.png' : undef;
   if ($img && $img =~ /'/) { err "img «$img» in slug '$slug' has an apostrope"; next }  # for imgsize
   my ($imgw, $imgh);
@@ -173,8 +182,8 @@ while (glob '*/') {
     =~ s|\Q{{description}}\E|$desc|gr
     =~ s|\Q{{type}}\E|article|gr
     =~ s|\Q{{pubtime}}\E|(ichomp slurp "$slug/.pub") =~ s,\.[0-9]+,,r|gre
-    =~ s|\Q{{tags}}\E|$tags =~ s,\Q{{root}}\E,../,gr|gre
-    =~ s|\Q{{time}}\E|$time =~ s,[.][0-9]+,,r|gre
+    =~ s|\Q{{tags}}\E|$tags|gre
+    =~ s|\Q{{time}}\E|$time{str}|gre
     =~ s|(.*)\Q{{imgurl}}\E(.*\n)|   $img ? "$1$img$2" : ''|gre
     =~ s|(.*)\Q{{imgwidth}}\E(.*\n)| $img ? "$1$imgw$2" : ''|gre
     =~ s|(.*)\Q{{imgheight}}\E(.*\n)|$img ? "$1$imgh$2" : ''|gre
@@ -204,12 +213,24 @@ while (glob '*/') {
   print { $f } slurp('.t/footer.html')
     =~ s|\Q{{homelinkattrs}}\E|href="../"|gr
     =~ s|\Q{{homescripttag}}\E\n||gr  # script is used only on the home page for filtering by tags
+    =~ s|\Q{{root}}\E|../|gr
     =~ s|\A|\n</article>\n|r
     ;
   close $f;
-  push @posts, { slug => $slug, title => $title, time => $time, tags => $tags, description => $desc, picture => $pic };
+  push @posts, {
+    slug => $slug,
+    title => $title,
+    time_str => $time{str},
+    time_pub => $time{pub},
+    time_upd => $time{upd},
+    tags => $tags,
+    description => $desc,
+    picture => $pic,
+  };
   say "wrote '$slug'";
 }
+
+@posts = sort { $b->{time_pub} cmp $a->{time_pub} } @posts;  # newest first by publishing date
 
 # home page
 
@@ -229,7 +250,7 @@ print { $f } slurp('.t/header.html')
   ;
 print { $f } join "\n", map {
   my $tags = $_->{tags} =~ s,\Q{{root}}\E,,gr;
-  my $time = $_->{time} =~ s,[.][0-9]+,,r;
+  my $time = $_->{time_str};
   my $img = $_->{picture} // '';
   qq[<section class="card"><!--
    --><h2><a href="$_->{slug}">$img$_->{title}</a></h2><!--
@@ -239,11 +260,86 @@ print { $f } join "\n", map {
      --><div class="time">$time</div><!--
    --></div><!--
   --></section>] =~ s/\s+/ /gr =~ s/<!--.*?-->//gr =~ s/\s*\Z//gr
-  } sort { $b->{time} cmp $a->{time} } @posts;
+  } @posts;
 print { $f } slurp('.t/footer.html')
   =~ s|\Q{{homelinkattrs}}\E|aria-current="page" href=""|gr
   =~ s|\Q{{homescripttag}}\E|<script>@{[slurp 'etc/homescript.min.js']}</script>|gr
+    =~ s|\Q{{root}}\E||gr
   =~ s|\A|\n</main>\n|r
   ;
 close $f;
+
+# atom feed
+
+sub updated_from_time {
+  my ($date, $time) = $_[0] =~ /^([^.]*)(?:[.]([0-9]+))?$/;  # ASSUMPTION: no more than 6 pub/upd per day.
+  return sprintf "%sT%02d:00:00Z", $date, 4*($time // 0);
+}
+
+my $updated = updated_from_time maxstr map { $_->{time_upd} // '', $_->{time_pub} } @posts;
+
+open my $m, '>', 'feed.atom.xml';
+print { $m } <<"END_OF_TEXT" =~ s/>\s+</></gr;
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" dir="rtl">
+  <title>كتابات وترجمات — نور الدين</title>
+  <link href="https://noureddin.github.io/w/" />
+  <link rel="self" href="https://noureddin.github.io/w/feed.atom" />
+  <icon>https://noureddin.github.io/w/etc/favicon-72x72.png</icon>
+  <logo>https://noureddin.github.io/etc/cover-og.png</logo>
+  <updated>$updated</updated>
+  <id>tag:noureddin.github.io,2023:/w/feed.atom.xml</id>
+  <author>
+    <name>نور الدين | Noureddin</name>
+  </author>
+END_OF_TEXT
+
+# https://www.ietf.org/archive/id/draft-snell-atompub-bidi-05.html
+# The 2005/Atom declaration is needed for dir="rtl",
+# which is honored by by some readers (like Liferea)
+# but not by others (like Akregator) (even https://validator.w3.org/feed/ chokes on it)
+# but Akregator renders Unicode properly, so Unicode RTL embedding works.
+
+use charnames ":full", ":alias" => {
+  LTR => "LEFT-TO-RIGHT EMBEDDING",
+  RTL => "RIGHT-TO-LEFT EMBEDDING",
+  POP => "POP DIRECTIONAL FORMATTING",
+};
+
+# ASSUMPTION: if the arg contains RTL or LTR EMBED, it must be balanced with POP DIR.
+sub RTL(_) { "\N{RTL}" . $_[0] . "\N{POP}" }
+
+sub dehtml_ltr(_) { $_[0] =~ s/<span[^<>]*>/\N{LTR}/gr =~ s/<\/span>/\N{POP}/gr }
+
+sub format_text(_) {
+  # warn if RTL+LTR != POP (see RTL()'s ASSUMPTION above)
+  warn "unbalanced directional embedding (LTR EMBED, RTL EMBED, and POP DIR) in:\n  $_[0]\n"
+    unless (length $_[0] =~ s/[^\N{RTL}]+//gr)  # count RTL chars in $_[0]
+         + (length $_[0] =~ s/[^\N{LTR}]+//gr)
+        == (length $_[0] =~ s/[^\N{POP}]+//gr)
+        ;
+  # call dehtml_ltr to fix [[-]], then call RTL to fix the overall direction
+  return RTL(dehtml_ltr($_[0]));
+}
+
+for my $post (@posts) {
+  my $updated = updated_from_time($post->{time_upd} // $post->{time_pub});
+  my $date = $post->{time_pub} =~ s/[.].*//r;
+  my $published_tag = !defined $post->{time_upd} ? '' :
+    ('<published>'.updated_from_time($post->{time_pub}).'</published>');
+  my $slug = $post->{slug};
+  print { $m }
+    '<entry>',
+    '<title>', format_text($post->{title}), '</title>',
+    '<link rel="alternate" href="', $slug, '" />',
+    '<updated>', $updated, '</updated>',
+    $published_tag,
+    '<id>tag:noureddin.github.io,', $date, ':/w/', $slug, '</id>',
+    '<summary>', format_text($post->{description}), '</summary>',
+    # '<content type="html">', , '</content>',  # TODO
+    '</entry>', "\n";
+}
+
+print { $m } '</feed>';
+close $m;
 
