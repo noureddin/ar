@@ -2,6 +2,7 @@
 # vim: set fdm=marker:
 use v5.14; use warnings; use autodie; use utf8;
 use open qw[ :encoding(UTF-8) :std ];
+use List::Util qw[ max maxstr ];
 
 # definitions {{{
 
@@ -120,9 +121,9 @@ sub __parse_time_in { my ($slug, $upd_not_pub) = @_;
 }
 
 sub get_time_for { my ($slug) = @_;
-  # for now, time is defined in $slug/.pub (publishing) and $slug/.upd (last update, if any),
-  # in YYYY-mm-dd formate (UTC day), optionally ending with '.1' (and so on)
-  # for subsequent posts in the same day.
+  # time is defined in $slug/.pub (publishing) and $slug/.upd (last update, if any),
+  # in YYYY-mm-dd formate (UTC day),
+  # optionally ending with '.1' (and so on) for subsequent posts in the same day.
   if (!-f "$slug/.pub") {
     err "article '$slug' has no publishing time";
     return;
@@ -143,7 +144,7 @@ my @posts;
 
 while (glob '*/') {
   my $slug = $_ =~ s,/$,,r;
-  next if $slug eq 'etc';
+  next if $slug eq 'etc' || $slug eq 'notes';
   if ($slug =~ /'/) { err "slug «$slug» has an apostrophe"; next }  # for parse
   if (!-e "$slug/.src") { err "article '$slug' has no src"; next }
   if (!-e "$slug/.head") { err "article '$slug' has no title"; next }
@@ -197,7 +198,7 @@ while (glob '*/') {
     }gre
     =~ s|<p>(<img[^<>]*>)</p>|<center>$1</center>|gr
     =~ s|<p>(!!)(\S+)</p>|picture_of("$slug/$2") =~ s,"$slug/,",gr|gre
-    =~ s|(<code>.*?</code>)|<nobr>$1</nobr>|gr  # or "`code`;" could have a line break after `code`; see https://stackoverflow.com/a/40827310
+    =~ s|(<code>.*?</code>)|<nobr>$1</nobr>|gr  # otherwise "`code`;" could have a line break after `code`; see https://stackoverflow.com/a/40827310
     =~ s/\s+\Z//gr
     ;
   print { $f } slurp('.t/footer.html')

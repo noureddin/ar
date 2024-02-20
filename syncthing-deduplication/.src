@@ -1,5 +1,6 @@
 ::: note
 هذا المقال مترجم عن [Syncthing: The data dedup­lica­tion master](https://www.ctrl.blog/entry/syncthing-deduplication-master.html)، المنشور++{{2022-05-05}}.
+وقد نشرت هذه الترجمة أيضا [في مجتمع أسس](https://discourse.aosus.org/t/topic/3016).
 :::
 
 !!syncthing-storage-nvme-hdd-small
