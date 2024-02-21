@@ -241,6 +241,9 @@ print { $f } slurp('.t/header.html')
   =~ s|.*\Q{{description}}\E.*\n||gr  # TODO: add a description
   =~ s|\Q{{type}}\E|website|gr
   =~ s|.*\Q{{pubtime}}\E.*\n||gr
+  =~ s|(.*)\Q{{imgurl}}\E(.*\n)||gr
+  =~ s|(.*)\Q{{imgwidth}}\E(.*\n)||gr
+  =~ s|(.*)\Q{{imgheight}}\E(.*\n)||gr
   =~ s|\Q{{logo}}\E|$logo|gr
   =~ s|\Q{{root}}\E||gr
   =~ s|\Q{{stylehash}}\E|$stylehash|gr
