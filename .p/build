@@ -283,12 +283,12 @@ print { $m } <<"END_OF_TEXT" =~ s/>\s+</></gr;
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" dir="rtl">
   <title>كتابات وترجمات — نور الدين</title>
-  <link href="https://noureddin.github.io/w/" />
-  <link rel="self" href="https://noureddin.github.io/w/feed.atom" />
-  <icon>https://noureddin.github.io/w/etc/favicon-72x72.png</icon>
-  <logo>https://noureddin.github.io/etc/cover-og.png</logo>
+  <link href="https://www.noureddin.dev/w/" />
+  <link rel="self" href="https://www.noureddin.dev/w/feed.atom" />
+  <icon>https://www.noureddin.dev/w/etc/favicon-72x72.png</icon>
+  <logo>https://www.noureddin.dev/etc/cover-og.png</logo>
   <updated>$updated</updated>
-  <id>tag:noureddin.github.io,2023:/w/feed.atom.xml</id>
+  <id>tag:noureddin.dev,2023:/w/feed.atom.xml</id>
   <author>
     <name>نور الدين | Noureddin</name>
   </author>
@@ -334,7 +334,7 @@ for my $post (@posts) {
     '<link rel="alternate" href="', $slug, '" />',
     '<updated>', $updated, '</updated>',
     $published_tag,
-    '<id>tag:noureddin.github.io,', $date, ':/w/', $slug, '</id>',
+    '<id>tag:noureddin.dev,', $date, ':/w/', $slug, '</id>',
     '<summary>', format_text($post->{description}), '</summary>',
     # '<content type="html">', , '</content>',  # TODO
     '</entry>', "\n";
