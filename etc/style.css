@@ -102,8 +102,9 @@ html {
   --width: min(95%, 35em);
 }
 
-.title, .header-content, main, article, .footer-content {
-  width: var(--width);
+.title, .header-content, main, article, .footer-content, .tnote {
+  width: 35em;
+  max-width: 95%;
   margin: 0 auto;
 }
 
@@ -254,7 +255,6 @@ h1:last-child {
 }
 
 .tnote {
-  width: var(--width);
   margin: 1em auto;
   text-align: center;
 }
