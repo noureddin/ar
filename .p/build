@@ -175,6 +175,23 @@ while (glob '*/') {
     $img = '';
   }
   my $pic = -f "$slug/.img" ? picture_of($slug .'/'. firstline "$slug/.img") : undef;
+  my $h = 0;  # for making anchors for h2 & h3 w/o ids
+  my $content = (scalar `.p/parse '$slug/.src'`)
+    =~ s|\{\{ ([0-9]{4}-[0-9]{2}-[0-9]{2}) \}\}|make_time($1)|grxe
+    =~ s|\+\+|&nbsp;|gr
+    =~ s|<h([23]) id="([^"]+)">(.*?)</h\1>|<h$1 id="$2"><a class="hh" href="#$2">#</a>$3<span class="hs">&nbsp;</span></h$1>|gr
+    =~ s|<h([23])>(.*?)</h\1>|<h$1 id="h$h"><a class="hh" href="#h@{[ ++$h ]}">#</a>$2<span class="hs">&nbsp;</span></h$1>|gr
+    =~ s|\[\[ (.*?) \]\]|<span class="en">$1</span>|grx
+    =~ s{<img(\b[^<>]+\bsrc)="([^<>"]+)"}{
+      my ($prefix, $imgurl) = ($1, $2);
+      my ($w, $h) = map { ichomp } `.p/imgsize '$slug/$imgurl'`;
+      qq[<img width="$w" height="$h"$prefix="$imgurl"]
+    }gre
+    =~ s|<p>(<img[^<>]*>)</p>|<center>$1</center>|gr
+    =~ s|<p>(!!)(\S+)</p>|picture_of("$slug/$2") =~ s,"$slug/,",gr|gre
+    =~ s|(<code>.*?</code>)|<nobr>$1</nobr>|gr  # otherwise "`code`;" could have a line break after `code`; see https://stackoverflow.com/a/40827310
+    =~ s/\s+\Z//gr
+    ;
   open my $f, '>', "$slug/index.html";
   print { $f } slurp('.t/header.html')
     =~ s|\Q{{pagetitle}}\E|$page_title|gr
@@ -193,23 +210,7 @@ while (glob '*/') {
     =~ s|\Q{{homelinkattrs}}\E|href="../"|gr
     =~ s|\Z|\n<article>|r
     ;
-  my $h = 0;
-  print { $f } (scalar `.p/parse '$slug/.src'`)
-    =~ s|\{\{ ([0-9]{4}-[0-9]{2}-[0-9]{2}) \}\}|make_time($1)|grxe
-    =~ s|\+\+|&nbsp;|gr
-    =~ s|<h([23]) id="([^"]+)">(.*?)</h\1>|<h$1 id="$2"><a class="hh" href="#$2">#</a>$3<span class="hs">&nbsp;</span></h$1>|gr
-    =~ s|<h([23])>(.*?)</h\1>|<h$1 id="h$h"><a class="hh" href="#h@{[ ++$h ]}">#</a>$2<span class="hs">&nbsp;</span></h$1>|gr
-    =~ s|\[\[ (.*?) \]\]|<span class="en">$1</span>|grx
-    =~ s{<img(\b[^<>]+\bsrc)="([^<>"]+)"}{
-      my ($prefix, $imgurl) = ($1, $2);
-      my ($w, $h) = map { ichomp } `.p/imgsize '$slug/$imgurl'`;
-      qq[<img width="$w" height="$h"$prefix="$imgurl"]
-    }gre
-    =~ s|<p>(<img[^<>]*>)</p>|<center>$1</center>|gr
-    =~ s|<p>(!!)(\S+)</p>|picture_of("$slug/$2") =~ s,"$slug/,",gr|gre
-    =~ s|(<code>.*?</code>)|<nobr>$1</nobr>|gr  # otherwise "`code`;" could have a line break after `code`; see https://stackoverflow.com/a/40827310
-    =~ s/\s+\Z//gr
-    ;
+  print { $f } $content;
   print { $f } slurp('.t/footer.html')
     =~ s|\Q{{homelinkattrs}}\E|href="../"|gr
     =~ s|\Q{{homescripttag}}\E\n||gr  # script is used only on the home page for filtering by tags
@@ -226,6 +227,7 @@ while (glob '*/') {
     tags => $tags,
     description => $desc,
     picture => $pic,
+    content => $content,
   };
   say "wrote '$slug'";
 }
@@ -330,6 +332,11 @@ for my $post (@posts) {
   my $published_tag = !defined $post->{time_upd} ? '' :
     ('<published>'.updated_from_time($post->{time_pub}).'</published>');
   my $slug = $post->{slug};
+  my $base = "https://www.noureddin.dev/w/$slug/";
+  my $content = $post->{content}
+    =~ s|<div class="note">(.*?)</div>|<blockquote>$1</blockquote>|grs
+    =~ s|( src(?:set)?=")|$1$base|grs
+    ;
   print { $m }
     '<entry>',
     '<title>', format_text($post->{title}), '</title>',
@@ -337,8 +344,8 @@ for my $post (@posts) {
     '<updated>', $updated, '</updated>',
     $published_tag,
     '<id>tag:noureddin.dev,', $date, ':/w/', $slug, '</id>',
-    '<summary>', format_text($post->{description}), '</summary>',
-    # TODO: <content type="html" xml:base="https://example.com/absolute-url-for-the-post/"><![CDATA[<p>unchanged html</p>]]></content>
+    # '<summary>', format_text($post->{description}), '</summary>',
+    '<content type="html" xml:base="', $base, '"><![CDATA[<div lang="ar" dir="rtl">', $content, '</div>]]></content>',
     '</entry>', "\n";
 }
 
