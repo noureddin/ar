@@ -284,24 +284,23 @@ my $updated = updated_from_time maxstr map { $_->{time_upd} // '', $_->{time_pub
 open my $m, '>', 'feed.atom.xml';
 print { $m } <<"END_OF_TEXT" =~ s/>\s+</></gr;
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom" dir="rtl">
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="ar" dir="rtl">
   <title>كتابات وترجمات — نور الدين</title>
-  <link href="https://www.noureddin.dev/w/" />
-  <link rel="self" href="https://www.noureddin.dev/w/feed.atom" />
+  <link rel="alternate" type="text/html" href="https://www.noureddin.dev/w/" />
+  <link rel="self" type="application/atom+xml" href="https://www.noureddin.dev/w/feed.atom.xml" />
   <icon>https://www.noureddin.dev/w/etc/favicon-72x72.png</icon>
   <logo>https://www.noureddin.dev/etc/cover-og.png</logo>
   <updated>$updated</updated>
   <id>tag:noureddin.dev,2023:/w/feed.atom.xml</id>
   <author>
     <name>نور الدين | Noureddin</name>
+    <uri>https://www.noureddin.dev/</uri>
   </author>
 END_OF_TEXT
 
 # https://www.ietf.org/archive/id/draft-snell-atompub-bidi-05.html
-# The 2005/Atom declaration is needed for dir="rtl",
-# which is honored by by some readers (like Liferea)
-# but not by others (like Akregator) (even https://validator.w3.org/feed/ chokes on it)
-# but Akregator renders Unicode properly, so Unicode RTL embedding works.
+# dir="rtl" is not widely supported, even https://validator.w3.org/feed/ chokes on it,
+# so Unicode RTL embedding is still needed.
 
 use charnames ":full", ":alias" => {
   LTR => "LEFT-TO-RIGHT EMBEDDING",
@@ -334,12 +333,12 @@ for my $post (@posts) {
   print { $m }
     '<entry>',
     '<title>', format_text($post->{title}), '</title>',
-    '<link rel="alternate" href="', $slug, '" />',
+    '<link rel="alternate" type="text/html" href="', $slug, '" />',
     '<updated>', $updated, '</updated>',
     $published_tag,
     '<id>tag:noureddin.dev,', $date, ':/w/', $slug, '</id>',
     '<summary>', format_text($post->{description}), '</summary>',
-    # '<content type="html">', , '</content>',  # TODO
+    # TODO: <content type="html" xml:base="https://example.com/absolute-url-for-the-post/"><![CDATA[<p>unchanged html</p>]]></content>
     '</entry>', "\n";
 }
 
