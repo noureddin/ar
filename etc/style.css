@@ -22,6 +22,12 @@ code   { font-size: 0.875em }
 
 /* colors */
 
+footer svg {  /* feed icon; don't change width or height */
+  fill: currentColor;
+  vertical-align: -.2em;
+  /* TODO: text-underline => border */
+}
+
 /* if prefer light */
   html { background: #efefef }
   html { color: #38383c }

@@ -167,6 +167,11 @@ sub get_time_for { my ($slug) = @_;
 
 my $stylehash = hash 'etc/style.min.css';
 my $logo = slurp 'etc/logo.svg';
+my $feedicon = slurp 'etc/feed-icon.svg';
+# based on https://en.wikipedia.org/wiki/File:Feed-icon.svg
+# flipped & made monochrome with Inkscape,
+# then compressed with vecta.io/nano
+# then modified manually a bit.
 
 my @posts;
 
@@ -232,6 +237,7 @@ while (glob '*/') {
   print { $f } slurp('.t/footer.html')
     =~ s|\Q{{homelinkattrs}}\E|href="../"|gr
     =~ s|\Q{{homescripttag}}\E\n||gr  # script is used only on the home page for filtering by tags
+    =~ s|\Q{{feedicon}}\E|$feedicon|gr
     =~ s|\Q{{root}}\E|../|gr
     =~ s|\A|\n</article>\n|r
     ;
@@ -287,7 +293,8 @@ print { $f } join "\n", map {
 print { $f } slurp('.t/footer.html')
   =~ s|\Q{{homelinkattrs}}\E|aria-current="page" href=""|gr
   =~ s|\Q{{homescripttag}}\E|<script>@{[slurp 'etc/homescript.min.js']}</script>|gr
-    =~ s|\Q{{root}}\E||gr
+  =~ s|\Q{{feedicon}}\E|$feedicon|gr
+  =~ s|\Q{{root}}\E||gr
   =~ s|\A|\n</main>\n|r
   ;
 close $f;
