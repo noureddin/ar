@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="ar" dir="rtl"><title>كتابات وترجمات — نور الدين</title><link rel="alternate" type="text/html" href="https://www.noureddin.dev/w/" /><link rel="self" type="application/atom+xml" href="https://www.noureddin.dev/w/feed.atom.xml" /><icon>https://www.noureddin.dev/w/etc/favicon-72x72.png</icon><logo>https://www.noureddin.dev/etc/cover-og.png</logo><updated>2024-02-27T00:00:00Z</updated><id>tag:noureddin.dev,2023:/w/feed.atom.xml</id><author><name>نور الدين | Noureddin</name><uri>https://www.noureddin.dev/</uri></author>
 <entry><title>‫خدعوك فقالوا: البرمجة بجافاسكربت المحضة غير قابلة للتوسع‬</title><link rel="alternate" type="text/html" href="js-scale" /><updated>2024-02-27T00:00:00Z</updated><id>tag:noureddin.dev,2024-02-27:/w/js-scale</id><content type="html" xml:base="https://www.noureddin.dev/w/js-scale/"><![CDATA[<div lang="ar" dir="rtl"><blockquote>
-<p>هذا المقال مترجم عن <a href="https://gomakethings.com/vanilla-js-doesnt-scale/">Vanilla JS doesn't scale</a>، المنشور&nbsp;<time datetime="2023-12-18" title="اليوم الثامن عشر من ديسمبر / كانون الأول ٢٠٢٣">٢٠٢٣/١٢/١٨</time>.</p>
+<p>هذا المقال مترجم عن <a href="https://gomakethings.com/vanilla-js-doesnt-scale/">Vanilla JS doesn't scale</a>، المنشور&nbsp;<time datetime="2023-12-18" title="اليوم الثامن عشر من ديسمبر / كانون الأول ٢٠٢٣">٢٠٢٣/١٢/١٨</time>.
+وقد نشرت هذه الترجمة أيضا <a href="https://discourse.aosus.org/t/topic/3101">في مجتمع أسس</a>.</p>
 </blockquote>
 <p>شارك أحد طلابي أمس هراءً منشورا في تويتر عن شكوى الناس من أن البرمجة بجافاسكربت المحضة غير قابلة للتوسع، وأنها تعني إعادة اختراع الأشياء من البَدء، وغير ذلك.</p>
 <p>أردت اليوم توضيح لماذا كل ذلك هذيان لا يعتد به.</p>
