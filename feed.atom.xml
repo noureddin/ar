@@ -1,4 +1,37 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="ar" dir="rtl"><title>كتابات وترجمات — نور الدين</title><link rel="alternate" type="text/html" href="https://www.noureddin.dev/w/" /><link rel="self" type="application/atom+xml" href="https://www.noureddin.dev/w/feed.atom.xml" /><icon>https://www.noureddin.dev/w/etc/favicon-72x72.png</icon><logo>https://www.noureddin.dev/etc/cover-og.png</logo><updated>2024-02-20T00:00:00Z</updated><id>tag:noureddin.dev,2023:/w/feed.atom.xml</id><author><name>نور الدين | Noureddin</name><uri>https://www.noureddin.dev/</uri></author>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="ar" dir="rtl"><title>كتابات وترجمات — نور الدين</title><link rel="alternate" type="text/html" href="https://www.noureddin.dev/w/" /><link rel="self" type="application/atom+xml" href="https://www.noureddin.dev/w/feed.atom.xml" /><icon>https://www.noureddin.dev/w/etc/favicon-72x72.png</icon><logo>https://www.noureddin.dev/etc/cover-og.png</logo><updated>2024-02-27T00:00:00Z</updated><id>tag:noureddin.dev,2023:/w/feed.atom.xml</id><author><name>نور الدين | Noureddin</name><uri>https://www.noureddin.dev/</uri></author>
+<entry><title>‫خدعوك فقالوا: البرمجة بجافاسكربت المحضة غير قابلة للتوسع‬</title><link rel="alternate" type="text/html" href="js-scale" /><updated>2024-02-27T00:00:00Z</updated><id>tag:noureddin.dev,2024-02-27:/w/js-scale</id><content type="html" xml:base="https://www.noureddin.dev/w/js-scale/"><![CDATA[<div lang="ar" dir="rtl"><blockquote>
+<p>هذا المقال مترجم عن <a href="https://gomakethings.com/vanilla-js-doesnt-scale/">Vanilla JS doesn't scale</a>، المنشور&nbsp;<time datetime="2023-12-18" title="اليوم الثامن عشر من ديسمبر / كانون الأول ٢٠٢٣">٢٠٢٣/١٢/١٨</time>.</p>
+</blockquote>
+<p>شارك أحد طلابي أمس هراءً منشورا في تويتر عن شكوى الناس من أن البرمجة بجافاسكربت المحضة غير قابلة للتوسع، وأنها تعني إعادة اختراع الأشياء من البَدء، وغير ذلك.</p>
+<p>أردت اليوم توضيح لماذا كل ذلك هذيان لا يعتد به.</p>
+<p>لنبدأ!</p>
+<center><picture><source type="image/avif" srcset="https://www.noureddin.dev/w/js-scale/cover.avif" width="700" height="463.112078346028"><source type="image/webp" srcset="https://www.noureddin.dev/w/js-scale/cover.webp" width="700" height="463.112078346028"><img src="https://www.noureddin.dev/w/js-scale/cover.png" width="700" height="463.112078346028"></picture></center>
+<h2 id="h1"><a class="hh" href="#h1">#</a> ما معنى قابلية التوسع؟<span class="hs">&nbsp;</span></h2>
+<p>من الناس من يعني بها أن «التطبيق يستطيع التعامل مع طلبات كثيرة في وقت واحد». فإنهم يظنون أن جافاسكربت المحضة أضعف من ريأكت (React) في فعل هذا.</p>
+<p>ومنهم من يظن أن استعمال ريأكت للنموذج الوهمي لكائنات المستند (virtual DOM) يجعلها أسرع من «النموذج الحقيقي لكائنات المستند»، ولا يدركون أن على ريأكت أن تتعامل مع هذا النموذج الحقيقي نفسه عاجلا أو آجلا.</p>
+<p>ومنهم من يقول أن «المكتبة تفرض عليك أنماطا تسهّل كتابة التطبيقات ورعايتها».</p>
+<p>لعل من المحتمل أن <em>ربما قد</em> يكون هذا صحيحا. لكن… اسأل ثمانية مبرمجي ريأكت كيف يتعاملون مع مشكلة معينة، يُجيبوك ثماني إجابات مختلفة. بل إن المكتبة نفسها غيرت رأيها ثلاث مرات أو أزيد بخصوص إدارة المصدر البرمجي عند التوسع. معظم المصادر البرمجية القائمة منذ زمن وتستعمل هذه المكتبة، تجدها فوضى متشابكة من الأنماط.</p>
+<p>وليست الأنماط جيدة إلا بقدر التزام المبرمجين باستعمالها بدقة وأمانة.</p>
+<h2 id="h2"><a class="hh" href="#h2">#</a> ستعيد اختراع بعض الأشياء…<span class="hs">&nbsp;</span></h2>
+<p>كل مشروع، سواء بنيته بمكتبة أو بغيرها، يحتاج كتابة أجزاء مخصصة.</p>
+<p>يبدو أن الكثيرين يؤمنون واهمين أن «جافاسكربت المحضة» تعنى «اكتب التطبيق بكامله من اللاشيء»؛ هذا لغوٌ محال.</p>
+<p>إني أستعمل المكتبات طوال الوقت. أختارها بعناية وأنظر كيف تعمل. أوثر المكتبات التي لا تعتمد على مكتبات أخرى (هذا ما يجعلها «محضة»)، والتي فعلا تراعي الوصولية (accessibility).</p>
+<p>أحيانا لا أجد الأداة المناسبة، فعندئذٍ أبنيها بنفسي.</p>
+<p>أعجز عن فهم لما هذا أسوأ من استعمال مكوِّن جاهز قد لا يراعي الوصولية، أو يفعل أزيد مما تريد، أو يفرض عليك تثبيت مكتبة <em>أخرى</em> ليعمل.</p>
+<h2 id="h3"><a class="hh" href="#h3">#</a> كل مكتبة مشهورة كانت مشروعا مدللا<span class="hs">&nbsp;</span></h2>
+<p>من يظنون أن جافاسكربت المحضة تعني إعادة اختراع كل شيء، يتناسون أن كل مكتبة يحبونها كانت في البَدء مشروعا مدلّلًا عند صاحبها، بجافاسكربت المحضة.</p>
+<p>كانت Angular موجودة عند إنشاء React. كانت React موجودة عند إنشاء Vue. كانت Vue موجودة عند إنشاء Preact و Solid.</p>
+<p>كانت NextJS و Veux موجودتان عندما أنشأ Rich Harris مكتبة Svelte. وكانت Svelte معروفة عند إنشاء Astro.</p>
+<p>وما إن تكتسب المكتبة عزمًا، تجد أولئك المستهزئين بجافاسكربت الأصيلة يسكتون عن إعادة اختراع الأشياء.</p>
+<h2 id="h4"><a class="hh" href="#h4">#</a> منصة الوب تفعل الكثير حقا<span class="hs">&nbsp;</span></h2>
+<p>تأتي هذه الردود غالبا من الذين لا يعرفون أدني شيء عن استعمال منصة الوب أي متصفحات الوب أي الوب الأصيل.</p>
+<p>قابلت أقواما من المبرمجين الذين اجتازوا معسكرات برمجية (Bootcamps)، لم يتعلموا فيها سوى ريأكت، ولا يعرفون أدني شيء عن مقدار ما يعتمدون على ريأكت في فعله والمتصفح يفعله لهم بغير مكتبة.</p>
+<p>هذا فشل المجال بقدر ما هو فشل الأفراد.</p>
+<p>شركات مفترسة تنقضّ على الذين لا يعلمون شيئا، فتأخذ منهم أموالا طائلة وتعدهم أن يعملوا بعد ستة أشهر في وظيفة بمئات الآلاف شهريا، ثم لا يعلمونهم إلا أسرع طرق البرمجة وأكسلها.</p>
+<p>إن الأمر مثل مدرسة فنية تخرّج بنّائين لا يعرفون شيئا عن قوانين البناء. لكن هذا يحدث عندنا لأن مجالنا يفتقر إلى التنظيم المهني والاعتماد.</p>
+<h2 id="h5"><a class="hh" href="#h5">#</a> لذا…<span class="hs">&nbsp;</span></h2>
+<p>ما أود قوله أن البرمجة بجافاسكربت المحضة قابلة للتوسع، وأنها ليست إعادة اختراع لكل شيء، وأن كل من يقول غير هذا لا يعرف أدنى شيء عما يقول.</p>
+<p><small>(الصورة إضافة المترجم وتصميمه، بخط Ubuntu Arabic، وخلفيتها من sttimm على pixabay.com.)</small></p></div>]]></content></entry>
 <entry><title>‫كف عن محاولة جعل الشبكات الاجتماعية «تنجح»‬</title><link rel="alternate" type="text/html" href="network-success" /><updated>2024-02-20T00:00:00Z</updated><id>tag:noureddin.dev,2024-02-20:/w/network-success</id><content type="html" xml:base="https://www.noureddin.dev/w/network-success/"><![CDATA[<div lang="ar" dir="rtl"><blockquote>
 <p>هذا المقال مترجم عن <a href="https://ploum.net/2023-07-06-stop-trying-to-make-social-networks-succeed.html">Stop Trying to Make Social Networks Succeed</a>، المنشور&nbsp;<time datetime="2023-07-06" title="اليوم السادس من يوليو / تموز ٢٠٢٣">٢٠٢٣/٠٧/٠٦</time>.</p>
 </blockquote>
