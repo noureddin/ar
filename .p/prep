@@ -8,6 +8,9 @@ $_ = slurp_stdin();
 # remove [[latin]] and {{time}} marks
 s,([][}{])\1,,g;
 
+# remove %% small marks
+s,%% ,,g;
+
 # remove headings' attributes
 s,^\{[^{}]+\}\n,,mg;
 

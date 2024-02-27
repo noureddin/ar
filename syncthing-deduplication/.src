@@ -29,4 +29,4 @@
 
 أُضيفت خاصية إزالة التكرار في Syncthing النسخة 1.8.0 (المُصدرة في يوليو / تموز عام ٢٠٢٠م)، وما زالت تعتبر تجريبية. وغالبا ستبقى هكذا وقتًا، بسبب احتمال أن هذه الخاصية قد تسبب علة تتسبب في فقد بيانات.
 
-([الصورة](https://www.ctrl.blog/media/hero/syncthing-storage-nvme-hdd.avif) من [المنشور الأصلي](https://www.ctrl.blog/entry/syncthing-deduplication-master.html) من [Daniel Aleksandersen](https://www.daniel.priv.no/) بترخيص [CC BY 4.0 License](https://creativecommons.org/licenses/by/4.0/deed.ar).)
+%% ([الصورة](https://www.ctrl.blog/media/hero/syncthing-storage-nvme-hdd.avif) من [المنشور الأصلي](https://www.ctrl.blog/entry/syncthing-deduplication-master.html) من [Daniel Aleksandersen](https://www.daniel.priv.no/) بترخيص [CC BY 4.0 License](https://creativecommons.org/licenses/by/4.0/deed.ar).)
